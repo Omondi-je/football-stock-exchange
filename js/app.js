@@ -1,5 +1,7 @@
 import { TEAM_REGISTRY, simulateMatch, calculatePriceChange } from './data.js';
 import { Portfolio } from './portfolio.js';
+import { VolatilityLab } from './volatility.js';
+import { Predictions } from './predictions.js';
 
 const CONFIG = { refreshInterval: 30000, currency: 'FSE', version: '2.0.2-beta', matchSpeed: 5000 };
 
@@ -187,6 +189,9 @@ const Views = {
         return `<div class=\"main-header\"><h1 class=\"main-title\">Live Matches</h1><p class=\"main-subtitle\">Real-time match simulation and price impact</p></div><div id=\"live-match\" style=\"margin-bottom:var(--space-5);\">${LIVE_MATCH ? Components.matchCard(LIVE_MATCH) : '<div class=\"card\" style=\"text-align:center;padding:var(--space-6);\"><div style=\"font-size:32px;margin-bottom:var(--space-3);\">⏳</div><p style=\"color:var(--text-secondary);\">Waiting for next match...</p></div>'}</div><div class=\"card\"><div class=\"card-header\"><span class=\"card-title\">📜 Recent Matches</span></div>${MATCH_LOG.length === 0 ? '<p style=\"color:var(--text-secondary);padding:var(--space-4);\">No matches played yet.</p>' : MATCH_LOG.map(m => Components.matchCard(m)).join('')}</div>`;
     }
 };
+
+Views.volatility = function() { return VolatilityLab.render(); };
+Views.predictions = function() { return Predictions.render(); };
 
 const App = {
     currentView: 'overview',
