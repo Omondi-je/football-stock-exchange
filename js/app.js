@@ -285,13 +285,13 @@ const App = {
     }
 };
 
-// Initial indices data
+
 const LIVE_DATA = {
     indices: [
-        { name: 'FSE Global 50', value: 2847.32, change: 1.24, changePct: 0.04 },
-        { name: 'FSE Power', value: 1421.88, change: -8.42, changePct: -0.59 },
-        { name: 'FSE Upset', value: 89.45, change: 12.30, changePct: 15.93 },
-        { name: 'FSE Momentum', value: 67.21, change: 3.15, changePct: 4.92 }
+        { name: "FSE Global 50", value: 2847.32, change: 1.24, changePct: 0.04 },
+        { name: "FSE Power", value: 1421.88, change: -8.42, changePct: -0.59 },
+        { name: "FSE Upset", value: 89.45, change: 12.30, changePct: 15.93 },
+        { name: "FSE Momentum", value: 67.21, change: 3.15, changePct: 4.92 }
     ]
 };
 
