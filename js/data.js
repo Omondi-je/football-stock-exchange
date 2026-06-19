@@ -1,8 +1,3 @@
-/**
- * FOOTBALL STOCK EXCHANGE — DATA PIPELINE
- * Team registry, match simulation, price discovery
- */
-
 const TEAM_REGISTRY = {
     GER: { name: 'Germany', flag: '🇩🇪', conf: 'UEFA', elo: 1980, group: 'A', basePrice: 120 },
     ARG: { name: 'Argentina', flag: '🇦🇷', conf: 'CONMEBOL', elo: 2140, group: 'A', basePrice: 135 },
@@ -54,26 +49,19 @@ const TEAM_REGISTRY = {
     CMR: { name: 'Cameroon', flag: '🇨🇲', conf: 'CAF', elo: 1740, group: 'X', basePrice: 74 }
 };
 
-// Elo-based win probability
 function eloWinProb(eloA, eloB) {
     return 1 / (1 + Math.pow(10, (eloB - eloA) / 400));
 }
 
-// Simulate a match with realistic scorelines
 function simulateMatch(teamA, teamB) {
     const probA = eloWinProb(teamA.elo, teamB.elo);
     const probB = 1 - probA;
-    const drawProb = 0.25; // Base draw probability
-    
-    // Adjust for competitive balance
+    const drawProb = 0.25;
     const adjustedDraw = drawProb * (1 - Math.abs(probA - 0.5));
     const adjustedA = probA * (1 - adjustedDraw);
     const adjustedB = probB * (1 - adjustedDraw);
-    
     const rand = Math.random();
     let result, goalsA, goalsB, xGA, xGB;
-    
-    // Expected goals based on Elo difference
     const eloDiff = teamA.elo - teamB.elo;
     xGA = Math.max(0.3, 1.2 + eloDiff / 800 + (Math.random() - 0.5) * 0.8);
     xGB = Math.max(0.3, 1.2 - eloDiff / 800 + (Math.random() - 0.5) * 0.8);
@@ -92,9 +80,12 @@ function simulateMatch(teamA, teamB) {
         goalsB = Math.max(1, Math.round(xGB + Math.random() * 1.5));
     }
     
+    const aSym = Object.keys(TEAM_REGISTRY).find(k => TEAM_REGISTRY[k] === teamA);
+    const bSym = Object.keys(TEAM_REGISTRY).find(k => TEAM_REGISTRY[k] === teamB);
+    
     return {
-        teamA: teamA.symbol || Object.keys(TEAM_REGISTRY).find(k => TEAM_REGISTRY[k] === teamA),
-        teamB: teamB.symbol || Object.keys(TEAM_REGISTRY).find(k => TEAM_REGISTRY[k] === teamB),
+        teamA: aSym,
+        teamB: bSym,
         resultA: result,
         resultB: result === 'W' ? 'L' : result === 'L' ? 'W' : 'D',
         goalsA, goalsB, xGA, xGB,
@@ -104,45 +95,34 @@ function simulateMatch(teamA, teamB) {
     };
 }
 
-// Price discovery engine
 function calculatePriceChange(match, team, isTeamA) {
     const { resultA, resultB, goalsA, goalsB, xGA, xGB, upset, margin } = match;
     const result = isTeamA ? resultA : resultB;
     const myGoals = isTeamA ? goalsA : goalsB;
     const theirGoals = isTeamA ? goalsB : goalsA;
     const myXG = isTeamA ? xGA : xGB;
-    
-    let change = 0;
-    
-    // Base result impact
-    if (result === 'W') change += 5;
-    else if (result === 'D') change += 0;
-    else change -= 5;
-    
-    // Opponent strength adjustment
     const opponentElo = isTeamA ? TEAM_REGISTRY[match.teamB].elo : TEAM_REGISTRY[match.teamA].elo;
     const myElo = team.elo;
     const strengthDiff = (opponentElo - myElo) / 200;
     
+    let change = 0;
+    if (result === 'W') change += 5;
+    else if (result === 'D') change += 0;
+    else change -= 5;
+    
     if (result === 'W') change += strengthDiff * 3;
     else if (result === 'L') change -= strengthDiff * 3;
     
-    // Margin bonus/penalty
     if (margin >= 3) change += result === 'W' ? 3 : -3;
     else if (margin >= 2) change += result === 'W' ? 1.5 : -1.5;
     
-    // xG efficiency
     const xgDiff = myGoals - myXG;
-    if (xgDiff > 1) change += 1; // Overperformed
-    else if (xgDiff < -1) change -= 1; // Underperformed
+    if (xgDiff > 1) change += 1;
+    else if (xgDiff < -1) change -= 1;
     
-    // Clean sheet
     if (theirGoals === 0 && result === 'W') change += 1;
-    
-    // Upset multiplier
     if (upset) change *= 1.5;
     
-    // Cap at ±20%
     return Math.max(-20, Math.min(20, change));
 }
 
