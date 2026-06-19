@@ -4,6 +4,9 @@ import { VolatilityLab } from './volatility.js';
 import { Predictions } from './predictions.js';
 import { TeamDetail } from './team-detail.js';
 import { TradeHistory } from './trade-history.js';
+import { IndicesView } from './indices-view.js';
+import { Watchlist } from './watchlist.js';
+import { Correlations } from './correlations.js';
 
 const CONFIG = { refreshInterval: 30000, currency: 'FSE', version: '2.0.2-beta', matchSpeed: 5000 };
 
@@ -196,6 +199,9 @@ Views.volatility = function() { return VolatilityLab.render(STOCKS); };
 Views.predictions = function() { return Predictions.render(); };
 Views['team-detail'] = function(symbol) { return TeamDetail.render(symbol, STOCKS); };
 Views['trade-history'] = function() { return TradeHistory.render(STOCKS); };
+Views['indices'] = function() { return IndicesView.render(STOCKS); };
+Views['watchlist'] = function() { return Watchlist.render(STOCKS); };
+Views['correlations'] = function() { return Correlations.render(STOCKS); };
 
 const App = {
     currentView: 'overview',
@@ -219,6 +225,11 @@ const App = {
         window.router = (view, param) => { 
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             this.renderView(view, param); 
+        };
+        window.toggleWatchlist = (symbol) => {
+            const result = Watchlist.toggle(symbol);
+            if (App.currentView === 'watchlist') App.renderView('watchlist');
+            else if (App.currentView === 'team-detail') App.renderView('team-detail', symbol);
         };
     },
     renderShell() {
