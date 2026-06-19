@@ -1,4 +1,4 @@
-# 🏟️ Football Stock Exchange
+ Football Stock Exchange
 
 > **A live financial market for World Cup 2026 nations.**
 >
@@ -6,7 +6,7 @@
 
 ---
 
-## What is this?
+What is this?
 
 The Football Stock Exchange is a **sports analytics + financial modeling** project that reimagines the FIFA World Cup as a tradable market. Each of the 48 participating nations is a "stock" with a live price that fluctuates based on match results, Elo ratings, momentum, and volatility.
 
@@ -19,7 +19,7 @@ Built during the 2026 World Cup, this project demonstrates:
 
 ---
 
-## 🚀 Live Demo
+ Live Demo
 
 Open in your browser: `https://your-codespace-url.github.dev`
 
@@ -32,15 +32,15 @@ npx serve . -l 8080
 
 ---
 
-## 📊 Core Features
+📊 Core Features
 
-### 1. Live Match Engine
+ 1. Live Match Engine
 - Simulates real-time World Cup matches with realistic scorelines
 - Goals are probabilistically generated based on Elo difference and xG (expected goals)
 - Upset detection flags major surprises
 - Match timer counts from 0' to 90' with in-match events
 
-### 2. Price Discovery Algorithm
+ 2. Price Discovery Algorithm
 Every match result triggers a price recalculation:
 
 | Factor | Impact |
@@ -55,14 +55,14 @@ Every match result triggers a price recalculation:
 
 **Formula:** `Price Change = f(Match Result, Opponent Strength, Margin, xG Efficiency, Upset)`
 
-### 3. Portfolio System
+ 3. Portfolio System
 - **$100,000 starting capital**
 - Buy/sell any team at live market price
 - Real-time P&L tracking (unrealized + realized)
 - Full transaction audit trail with timestamps
 - `localStorage` persistence across sessions
 
-### 4. Market Indices
+4. Market Indices
 | Index | Description |
 |-------|-------------|
 | **FSE Global 50** | Broad market benchmark across all 48 teams |
@@ -70,19 +70,18 @@ Every match result triggers a price recalculation:
 | **FSE Upset** | Volatility and surprise metric |
 | **FSE Momentum** | Aggregate performance trend |
 
-### 5. Volatility Lab ⚡
+5. Volatility Lab ⚡
 - Risk heatmap for all 48 teams
 - Market Volatility Index (average σ across all teams)
 - Volatility distribution histogram (Low/Medium/High)
 - Highest risk team identification
 
-### 6. Predictions Engine 🔮
+6. Predictions Engine 🔮
 - Pre-match win probability using Elo ratings
 - Confidence intervals per prediction
 - Draw probability adjustment
 - Favorite identification with certainty score
-
-### 7. Team Detail View
+ 7. Team Detail View
 Click any team in the market board for deep analytics:
 - Price history bar chart
 - Match-by-match performance log
@@ -90,19 +89,19 @@ Click any team in the market board for deep analytics:
 - Current portfolio position (if any)
 - Direct buy/sell buttons
 
-### 8. Correlations Matrix 🔗
+ 8. Correlations Matrix 🔗
 - Pearson correlation between team price movements
 - Color-coded heatmap (green = positive, red = negative)
 - Strongest positive/negative pair identification
 
-### 9. Watchlist ⭐
+ 9. Watchlist ⭐
 - Star favorite teams for quick access
 - Grid selector with live prices
 - One-click add/remove
 
 ---
 
-## 🏗️ Architecture
+ Architecture
 
 ```
 football-stock-exchange/
@@ -126,7 +125,7 @@ football-stock-exchange/
 
 ---
 
-## 🧠 The Price Discovery Algorithm
+ The Price Discovery Algorithm
 
 ```javascript
 // Elo-based win probability
@@ -148,7 +147,7 @@ function calculatePriceChange(match, team, isTeamA) {
 
 ---
 
-## 📈 Sample Data
+Sample Data
 
 | Team | Symbol | Base Price | Elo | Confederation |
 |------|--------|-----------|-----|---------------|
@@ -163,7 +162,7 @@ function calculatePriceChange(match, team, isTeamA) {
 
 ---
 
-## 🎯 Why This Project?
+Why This Project?
 
 Most sports analytics projects predict match outcomes. This one asks a harder question: **"What is a team worth?"**
 
@@ -176,7 +175,7 @@ The result is a memorable, interactive demonstration of cross-domain thinking.
 
 ---
 
-## 📝 License
+ License
 
 MIT — Built for the 2026 FIFA World Cup.
 
