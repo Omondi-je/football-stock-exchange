@@ -1,9 +1,10 @@
-const STORAGE_KEY = 'fse_portfolio_v2';
+const STORAGE_KEY = 'fse_portfolio_v3';
 
 class Portfolio {
     constructor() {
         this.holdings = this.load();
         this.cash = this.loadCash();
+        this.trades = this.loadTrades();
         if (this.cash === null || isNaN(this.cash)) this.cash = 100000;
     }
     
@@ -21,9 +22,17 @@ class Portfolio {
         } catch { return null; }
     }
     
+    loadTrades() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY + '_trades');
+            return raw ? JSON.parse(raw) : [];
+        } catch { return []; }
+    }
+    
     save() {
         localStorage.setItem(STORAGE_KEY + '_holdings', JSON.stringify(this.holdings));
         localStorage.setItem(STORAGE_KEY + '_cash', String(this.cash));
+        localStorage.setItem(STORAGE_KEY + '_trades', JSON.stringify(this.trades));
     }
     
     buy(symbol, price, quantity = 1) {
@@ -37,6 +46,17 @@ class Portfolio {
         h.totalCost += cost;
         h.quantity += quantity;
         h.avgPrice = h.totalCost / h.quantity;
+        
+        this.trades.unshift({
+            id: Date.now(),
+            type: 'BUY',
+            symbol,
+            price,
+            quantity,
+            total: cost,
+            timestamp: new Date().toISOString(),
+            pnl: null
+        });
         this.save();
         return { success: true, holding: this.holdings[symbol] };
     }
@@ -47,11 +67,23 @@ class Portfolio {
         const proceeds = price * quantity;
         const costBasis = h.avgPrice * quantity;
         const pnl = proceeds - costBasis;
+        
         this.cash += proceeds;
         h.quantity -= quantity;
         h.totalCost -= costBasis;
         if (h.quantity === 0) delete this.holdings[symbol];
         else h.avgPrice = h.totalCost / h.quantity;
+        
+        this.trades.unshift({
+            id: Date.now(),
+            type: 'SELL',
+            symbol,
+            price,
+            quantity,
+            total: proceeds,
+            timestamp: new Date().toISOString(),
+            pnl: pnl
+        });
         this.save();
         return { success: true, pnl, proceeds };
     }
@@ -81,9 +113,14 @@ class Portfolio {
         };
     }
     
+    getTrades() {
+        return this.trades;
+    }
+    
     reset() {
         this.holdings = {};
         this.cash = 100000;
+        this.trades = [];
         this.save();
     }
 }

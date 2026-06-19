@@ -3,6 +3,7 @@ import { Portfolio } from './portfolio.js';
 import { VolatilityLab } from './volatility.js';
 import { Predictions } from './predictions.js';
 import { TeamDetail } from './team-detail.js';
+import { TradeHistory } from './trade-history.js';
 
 const CONFIG = { refreshInterval: 30000, currency: 'FSE', version: '2.0.2-beta', matchSpeed: 5000 };
 
@@ -194,6 +195,7 @@ const Views = {
 Views.volatility = function() { return VolatilityLab.render(STOCKS); };
 Views.predictions = function() { return Predictions.render(); };
 Views['team-detail'] = function(symbol) { return TeamDetail.render(symbol, STOCKS); };
+Views['trade-history'] = function() { return TradeHistory.render(STOCKS); };
 
 const App = {
     currentView: 'overview',
