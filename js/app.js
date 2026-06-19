@@ -190,7 +190,7 @@ const Views = {
     }
 };
 
-Views.volatility = function() { return VolatilityLab.render(); };
+Views.volatility = function() { return VolatilityLab.render(STOCKS); };
 Views.predictions = function() { return Predictions.render(); };
 
 const App = {
