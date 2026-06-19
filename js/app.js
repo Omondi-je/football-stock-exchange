@@ -2,6 +2,7 @@ import { TEAM_REGISTRY, simulateMatch, calculatePriceChange } from './data.js';
 import { Portfolio } from './portfolio.js';
 import { VolatilityLab } from './volatility.js';
 import { Predictions } from './predictions.js';
+import { TeamDetail } from './team-detail.js';
 
 const CONFIG = { refreshInterval: 30000, currency: 'FSE', version: '2.0.2-beta', matchSpeed: 5000 };
 
@@ -62,7 +63,7 @@ const Components = {
         const volColor = team.volatility === 'High' ? 'var(--accent-warn)' : team.volatility === 'Medium' ? 'var(--accent-info)' : 'var(--accent-up)';
         const pnl = PORTFOLIO.getPnL(team.symbol, team.price);
         const owned = pnl ? `<span style="color:var(--accent-up);font-size:11px;"> ${pnl.quantity} @ ${pnl.avgPrice.toFixed(2)}</span>` : '';
-        return `<tr data-symbol="${team.symbol}"><td><div style="display:flex;align-items:center;gap:var(--space-3);"><span style="font-size:20px;">${team.flag}</span><div><div style="font-weight:600;color:var(--text-primary);">${team.symbol}${owned}</div><div style="font-size:12px;color:var(--text-muted);">${team.name}</div></div></div></td><td class="col-number" style="font-size:16px;font-weight:700;color:var(--text-primary);">${team.price.toFixed(2)}</td><td class="col-number ${isUp ? 'text-up' : 'text-down'}" style="font-weight:600;">${isUp ? '+' : ''}${team.change.toFixed(2)} (${isUp ? '+' : ''}${team.changePct.toFixed(2)}%)</td><td class="col-number text-mono">${team.volume}</td><td class="col-number text-mono">${team.marketCap}</td><td class="col-number"><div style="display:flex;align-items:center;gap:var(--space-2);"><div style="width:60px;height:4px;background:var(--bg-elevated);border-radius:2px;overflow:hidden;"><div style="width:${team.momentum}%;height:100%;background:linear-gradient(90deg,var(--accent-up),${team.momentum > 80 ? 'var(--accent-warn)' : 'var(--accent-up)'});border-radius:2px;"></div></div><span class="text-mono" style="font-size:12px;">${team.momentum}</span></div></td><td class="col-number" style="color:${volColor};font-weight:600;font-size:13px;">${team.volatility.toUpperCase()}</td><td>${this.sparkline(team.sparkline)}</td></tr>`;
+        return `<tr data-symbol="${team.symbol}" onclick="window.router('team-detail','${team.symbol}')" style="cursor:pointer;"><td><div style="display:flex;align-items:center;gap:var(--space-3);"><span style="font-size:20px;">${team.flag}</span><div><div style="font-weight:600;color:var(--text-primary);">${team.symbol}${owned}</div><div style="font-size:12px;color:var(--text-muted);">${team.name}</div></div></div></td><td class="col-number" style="font-size:16px;font-weight:700;color:var(--text-primary);">${team.price.toFixed(2)}</td><td class="col-number ${isUp ? 'text-up' : 'text-down'}" style="font-weight:600;">${isUp ? '+' : ''}${team.change.toFixed(2)} (${isUp ? '+' : ''}${team.changePct.toFixed(2)}%)</td><td class="col-number text-mono">${team.volume}</td><td class="col-number text-mono">${team.marketCap}</td><td class="col-number"><div style="display:flex;align-items:center;gap:var(--space-2);"><div style="width:60px;height:4px;background:var(--bg-elevated);border-radius:2px;overflow:hidden;"><div style="width:${team.momentum}%;height:100%;background:linear-gradient(90deg,var(--accent-up),${team.momentum > 80 ? 'var(--accent-warn)' : 'var(--accent-up)'});border-radius:2px;"></div></div><span class="text-mono" style="font-size:12px;">${team.momentum}</span></div></td><td class="col-number" style="color:${volColor};font-weight:600;font-size:13px;">${team.volatility.toUpperCase()}</td><td>${this.sparkline(team.sparkline)}</td></tr>`;
     },
     
     matchCard(match) {
@@ -192,6 +193,7 @@ const Views = {
 
 Views.volatility = function() { return VolatilityLab.render(STOCKS); };
 Views.predictions = function() { return Predictions.render(); };
+Views['team-detail'] = function(symbol) { return TeamDetail.render(symbol, STOCKS); };
 
 const App = {
     currentView: 'overview',
@@ -211,14 +213,19 @@ const App = {
             else alert(res.error);
         };
         window.resetPortfolio = () => { PORTFOLIO.reset(); this.renderView('portfolio'); };
+        window.PORTFOLIO_GLOBAL = PORTFOLIO;
+        window.router = (view, param) => { 
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            this.renderView(view, param); 
+        };
     },
     renderShell() {
         document.getElementById('app').innerHTML = `<div class=\"app-shell\"><header class=\"app-header\"><div class=\"header-brand\"><div class=\"brand-icon\">FSE</div><div><div class=\"brand-text\">Football Stock Exchange</div><div class=\"brand-sub\">WC 2026 EDITION</div></div></div><div class=\"header-meta\"><div class=\"live-badge\"><span class=\"live-dot\"></span>MARKET OPEN</div><div class=\"market-status\">${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} UTC</div></div></header><aside class=\"app-sidebar\"><div class=\"sidebar-section\"><div class=\"sidebar-label\">Market</div><div class=\"nav-item active\" data-view=\"overview\"><span class=\"nav-icon\">📊</span> Overview</div><div class=\"nav-item\" data-view=\"indices\"><span class=\"nav-icon\">📈</span> Indices</div><div class=\"nav-item\" data-view=\"teams\"><span class=\"nav-icon\">⚽</span> Team Stocks</div><div class=\"nav-item\" data-view=\"matches\"><span class=\"nav-icon\">🏟️</span> Live Matches</div></div><div class=\"sidebar-section\"><div class=\"sidebar-label\">Portfolio</div><div class=\"nav-item\" data-view=\"watchlist\"><span class=\"nav-icon\">⭐</span> Watchlist</div><div class=\"nav-item\" data-view=\"portfolio\"><span class=\"nav-icon\">💼</span> My Portfolio</div><div class=\"nav-item\" data-view=\"history\"><span class=\"nav-icon\">📜</span> Trade History</div></div><div class=\"sidebar-section\"><div class=\"sidebar-label\">Analytics</div><div class=\"nav-item\" data-view=\"predictions\"><span class=\"nav-icon\">🔮</span> Predictions</div><div class=\"nav-item\" data-view=\"correlations\"><span class=\"nav-icon\">🔗</span> Correlations</div><div class=\"nav-item\" data-view=\"volatility\"><span class=\"nav-icon\">⚡</span> Volatility Lab</div></div></aside><main class=\"app-main\" id=\"main-content\"></main><div class=\"app-ticker\" id=\"ticker\"></div></div>`;
         document.querySelectorAll('.nav-item').forEach(item => item.addEventListener('click', () => { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); item.classList.add('active'); this.renderView(item.dataset.view); }));
     },
-    renderView(viewName) {
+    renderView(viewName, param) {
         this.currentView = viewName;
-        document.getElementById('main-content').innerHTML = Views[viewName] ? Views[viewName]() : `<div class=\"main-header\"><h1 class=\"main-title\">${viewName.charAt(0).toUpperCase() + viewName.slice(1)}</h1><p class=\"main-subtitle\">Coming in Phase 3...</p></div><div class=\"card\" style=\"text-align:center;padding:var(--space-8);\"><div style=\"font-size:48px;margin-bottom:var(--space-4);\">🚧</div><h2 style=\"font-family:var(--font-heading);margin-bottom:var(--space-3);\">Under Construction</h2><p style=\"color:var(--text-secondary);\">This view is being built in the next phase.</p></div>`;
+        document.getElementById('main-content').innerHTML = Views[viewName] ? Views[viewName](param) : `<div class=\"main-header\"><h1 class=\"main-title\">${viewName.charAt(0).toUpperCase() + viewName.slice(1)}</h1><p class=\"main-subtitle\">Coming in Phase 3...</p></div><div class=\"card\" style=\"text-align:center;padding:var(--space-8);\"><div style=\"font-size:48px;margin-bottom:var(--space-4);\">🚧</div><h2 style=\"font-family:var(--font-heading);margin-bottom:var(--space-3);\">Under Construction</h2><p style=\"color:var(--text-secondary);\">This view is being built in the next phase.</p></div>`;
     },
     startTicker() {
         const items = Object.values(STOCKS);
