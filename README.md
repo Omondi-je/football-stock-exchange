@@ -63,6 +63,7 @@ Every match result triggers a price recalculation:
 - `localStorage` persistence across sessions
 
 4. Market Indices
+   
 | Index | Description |
 |-------|-------------|
 | **FSE Global 50** | Broad market benchmark across all 48 teams |
